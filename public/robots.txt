@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://osvaldo-gasparini.github.io/time-calculator/sitemap.xml
