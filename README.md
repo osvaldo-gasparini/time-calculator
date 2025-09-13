@@ -1,47 +1,103 @@
-# Svelte + TS + Vite
+# Time Calculator
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+A tiny, fast web app to quickly add up lots of time entries. I built it for situations where I need to sum many hours/minutes and want the result immediately.
 
-## Recommended IDE Setup
+Live in the browser, no backend required.
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+## Features
 
-## Need an official Svelte framework?
+- Simple textarea: paste or type multiple time entries
+- Instant parsing and total calculation as you type
+- Clear breakdown of each entry (valid/invalid)
+- Friendly formatting of totals (e.g. `2 hrs 15 mins`)
+- Built with Svelte + TypeScript + Vite
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+## Supported input formats
 
-## Technical considerations
+Each entry can be written on a new line or separated by commas. Accepted formats include:
 
-**Why use this over SvelteKit?**
+- Hours only: `1 hr`, `2hr`, `10 hrs`
+- Minutes only: `15 min`, `30min`, `90 mins`
+- Hours and minutes: `1:30 hr`, `1:05hr`
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+Notes:
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+- In `H:MM hr`, minutes must be between `00` and `59`.
+- Spacing is flexible (e.g., `1hr`, `1 hr`, `1:30hr` are all valid).
+- Capitalization does not matter (`HR`, `hr`, `Hr`).
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+## Examples
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+Input (each on its own line or separated by commas):
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
-
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
 ```
+1 hr
+30 min
+1:45 hr
+20min
+```
+
+Total: `3 hrs 35 mins`
+
+Invalid examples (these will be highlighted and not included in the total):
+
+```
+1:75 hr   // minutes cannot be 75
+abc       // unknown format
+```
+
+## How to run locally
+
+- Prerequisites: Node.js 18+
+
+Commands:
+
+- Install dependencies: `npm install`
+- Start dev server: `npm run dev`
+- Build for production: `npm run build`
+- Preview production build: `npm run preview`
+
+These scripts are defined in `package.json` and use Vite under the hood.
+
+## Using the app
+
+- Open the dev URL printed by Vite (usually `http://localhost:5173`).
+- Type or paste your time entries into the textarea.
+- The total and a per-entry breakdown update instantly.
+
+## Project structure
+
+- `src/App.svelte` — mounts the calculator component
+- `src/lib/TimeCalculator.svelte` — UI and reactive logic for the calculator
+- `src/lib/timeParser.ts` — parsing and formatting logic
+
+## Technical details
+
+Core logic is implemented in `src/lib/timeParser.ts`:
+
+- `parseTimeEntry(entry: string)` — parses a single entry into minutes; supports hour-only, minute-only, and `H:MM hr` formats
+- `parseTimeEntries(input: string)` — splits input by new lines or commas, parses all entries, returns a list, total minutes, and an overall validity flag
+- `formatTotalTime(totalMinutes: number)` — returns a friendly string such as `0 min`, `45 min`, `1 hr`, or `2 hrs 5 mins`
+
+UI is handled by `src/lib/TimeCalculator.svelte`:
+
+- A textarea bound to input
+- Reactive parsing using `parseTimeEntries`
+- Total is displayed with `formatTotalTime`
+- A breakdown list shows original input, the parsed minutes, or an invalid indicator
+
+## Embed as a component (optional)
+
+You can reuse the calculator inside another Svelte app by importing the component:
+
+```svelte
+<script lang="ts">
+  import TimeCalculator from './lib/TimeCalculator.svelte';
+</script>
+
+<TimeCalculator />
+```
+
+## License
+
+MIT. Feel free to use, modify, and share.
