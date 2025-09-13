@@ -3,7 +3,7 @@
 </script>
 
 <main>
-  <p>placeholder</p>
+  <TimeCalculator />
 </main>
 
 <style>
